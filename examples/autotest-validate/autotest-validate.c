@@ -27,5 +27,8 @@ bool this_function_returns_false()
  */
 const char *my_username()
 {
-    return "todo-please-enter-your-username-here-in-my_username";
+    // SN: Call the my_username() function in autotest-validate.c to get your hard coded username.
+
+    //return "todo-please-enter-your-username-here-in-my_username";
+    return "sane5805";
 }
