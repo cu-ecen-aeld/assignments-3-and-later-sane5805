@@ -14,7 +14,7 @@
 */
 void test_validate_my_username()
 {
-    char * user_name = my_username();
+    const char * user_name = my_username();
 
     char * user_name_from_config = malloc_username_from_conf_file();
     
