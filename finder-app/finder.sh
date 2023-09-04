@@ -38,7 +38,7 @@ find "$filesdir" -type f | while read -r file; do
 	if grep -q "$searchstr" "$file"; then
 		# Increment the match count and display the matching lines
 		match_count=$((match_count + 1))
-		grep "$searchstr" "$file"
+		#grep "$searchstr" "$file"
 	fi
 done
 
