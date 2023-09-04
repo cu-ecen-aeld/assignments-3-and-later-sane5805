@@ -10,6 +10,8 @@ fi
 writefile="$1"
 writestr="$2"
 
+echo "[Debug] writefile = $writefile & writestr = $writestr"
+
 # Check if writefile is not empty
 if [ -z "$writefile" ]; then
     echo "Error: 'writefile' argument is empty."
