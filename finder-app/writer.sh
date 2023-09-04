@@ -10,7 +10,7 @@ fi
 writefile="$1"
 writestr="$2"
 
-echo "[Debug] writefile = $writefile & writestr = $writestr"
+#echo "[Debug] writefile = $writefile & writestr = $writestr"
 
 # Check if writefile is not empty
 if [ -z "$writefile" ]; then
@@ -27,7 +27,7 @@ fi
 # Create the directory path if it doesn't exist
 #dir_path=$(dirname "$writefile")
 dir_path="${writefile%/*}"
-echo "[Debug] $dir_path"
+#echo "[Debug] $dir_path"
 
 if [ ! -d "$dir_path" ]; then
     echo "[Debug] if [ ! -d "$dir_path" ] is true"
@@ -43,7 +43,7 @@ echo "$writestr" > "$writefile" || {
     exit 1
 }
 
-echo "Content written to '$writefile'."
+#echo "Content written to '$writefile'."
 
 # Exit with success status (0)
 exit 0
