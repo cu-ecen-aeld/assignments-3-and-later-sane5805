@@ -24,7 +24,10 @@ fi
 
 # Create the directory path if it doesn't exist
 dir_path=$(dirname "$writefile")
+echo "[Debug] $dirpath"
+
 if [ ! -d "$dir_path" ]; then
+    echo "[Debug] if [ ! -d "$dir_path" ] is true"
     mkdir -p "$dir_path" || {
         echo "Error: Failed to create directory '$dir_path'."
         exit 1
