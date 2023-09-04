@@ -25,8 +25,9 @@ if [ -z "$writestr" ]; then
 fi
 
 # Create the directory path if it doesn't exist
-dir_path=$(dirname "$writefile")
+#dir_path=$(dirname "$writefile")
 echo "[Debug] $dirpath"
+dir_path="${writefile%/*}"
 
 if [ ! -d "$dir_path" ]; then
     echo "[Debug] if [ ! -d "$dir_path" ] is true"
