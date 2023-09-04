@@ -34,12 +34,11 @@ match_count=0
 #done
 
 # Loop through each file and search for the specified string
-find "$filesdir" -type f | while read -r file; do
-	if grep -q "$searchstr" "$file"; then
-		# Increment the match count and display the matching lines
-		match_count=$((match_count + 1))
-		#grep "$searchstr" "$file"
-	fi
+for file in $(find "$filesdir" -type f)
+do
+    if grep -q "$searchstr" "$file"; then
+        match_count=$((match_count + 1))
+    fi
 done
 
 # Display the results
