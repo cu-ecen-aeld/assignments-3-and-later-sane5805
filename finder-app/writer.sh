@@ -30,7 +30,6 @@ dir_path="${writefile%/*}"
 #echo "[Debug] $dir_path"
 
 if [ ! -d "$dir_path" ]; then
-    echo "[Debug] if [ ! -d "$dir_path" ] is true"
     mkdir -p "$dir_path" || {
         echo "Error: Failed to create directory '$dir_path'."
         exit 1
