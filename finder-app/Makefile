@@ -25,7 +25,7 @@ endif
 
 # New target: Generate cross-compile.txt
 cross-compile-info:
-	aarch64-none-linux-gnu-gcc -print-sysroot -v > cross-compile.txt
+	aarch64-none-linux-gnu-gcc -print-sysroot -v > /home/sane5805/AESD/assignment-1-sane5805/assignments/assignment2/cross-compile.txt
 	@echo "Cross-compile information has been saved to cross-compile.txt."
 
 # Add the new target to the dependencies of "all" to generate cross-compile.txt when building
