@@ -14,6 +14,10 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(LDFLAGS)
 
+# Set execute permission for the writer binary
+set-permissions:
+	chmod +x $(TARGET)
+
 # Clean target: Remove the writer application and object files
 clean:
 	rm -f $(TARGET) $(OBJ)
