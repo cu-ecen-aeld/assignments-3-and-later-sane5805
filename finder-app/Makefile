@@ -22,3 +22,11 @@ clean:
 ifeq ($(CROSS_COMPILE),aarch64-none-linux-gnu-)
 CC := $(CROSS_COMPILE)gcc
 endif
+
+# New target: Generate cross-compile.txt
+cross-compile-info:
+    aarch64-none-linux-gnu-gcc -print-sysroot -v > cross-compile.txt
+    @echo "Cross-compile information has been saved to cross-compile.txt."
+
+# Add the new target to the dependencies of "all" to generate cross-compile.txt when building
+all: cross-compile-info
