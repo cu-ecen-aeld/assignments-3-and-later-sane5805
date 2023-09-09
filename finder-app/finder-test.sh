@@ -54,7 +54,10 @@ fi
 make clean
 
 # Compile your "writer" utility using native compilation
-gcc -o writer writer.c
+# gcc -o writer writer.c
+
+# Compile your "writer" utility using the cross-compiler
+CROSS_COMPILE=aarch64-none-linux-gnu- make
 
 for i in $( seq 1 $NUMFILES)
 do
