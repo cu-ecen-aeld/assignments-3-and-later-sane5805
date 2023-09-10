@@ -3,6 +3,7 @@
 #include <string.h>
 #include <syslog.h>
 
+
 int main(int argc, char *argv[]) {
 
     //openlog("log", LOG_PID, LOG_USER);
