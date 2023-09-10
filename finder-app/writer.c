@@ -66,6 +66,5 @@ int main(int argc, char *argv[]) {
     closelog();
 
     // Exit with success status
-    exit(EXIT_FAILURE);
-    //return 1;
+    return 0;
 }
