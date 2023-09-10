@@ -1,38 +1,8 @@
-# Compiler settings
-CC := $(CROSS_COMPILE)gcc
-CFLAGS := -Wall -Werror
-LDFLAGS := -lm
-TARGET := writer
+CC=gcc
+CFLAG=-Wall -Werror
 
-# Source and object files
-SRC := writer.c
-OBJ := $(SRC:.c=.o)
+all: writer.c
+	$(CROSS_COMPILE)$(CC) $(CFLAGS) writer.c -o writer
 
-# Default target: Build the writer application
-all: $(TARGET)
-
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(TARGET) $(LDFLAGS)
-
-# Set execute permission for the writer binary
-set-permissions:
-	chmod +x $(TARGET)
-
-# Clean target: Remove the writer application and object files
 clean:
-	rm -f $(TARGET) $(OBJ)
-
-# Cross-compilation support
-ifeq ($(CROSS_COMPILE),aarch64-none-linux-gnu-)
-CC := $(CROSS_COMPILE)gcc
-endif
-
-# New target: Generate cross-compile.txt
-cross-compile-info:
-	mkdir -p ../assignments/assignment2
-	aarch64-none-linux-gnu-gcc -print-sysroot -v > ../assignments/assignment2/cross-compile.txt
-	@echo "Cross-compile information has been saved to cross-compile.txt."
-	echo "Cross-compilation was successful." > ../assignments/assignment2/fileresult.txt
-
-# Add the new target to the dependencies of "all" to generate cross-compile.txt when building
-all: cross-compile-info
+	rm -f *.o writer
