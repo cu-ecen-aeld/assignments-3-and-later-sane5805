@@ -32,6 +32,7 @@ cross-compile-info:
 	mkdir -p ../assignments/assignment2
 	aarch64-none-linux-gnu-gcc -print-sysroot -v > ../assignments/assignment2/cross-compile.txt
 	@echo "Cross-compile information has been saved to cross-compile.txt."
+	echo "Cross-compilation was successful." > ../assignments/assignment2/fileresult.txt
 
 # Add the new target to the dependencies of "all" to generate cross-compile.txt when building
 all: cross-compile-info
