@@ -161,6 +161,47 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+    int kidpid;
+    int fd = open("redirected.txt", O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    
+    if (fd < 0) { perror("open"); abort(); }
+    
+    switch (kidpid = fork()) {
+      case -1: perror("fork"); abort();
+      case 0:
+        if (dup2(fd, 1) < 0) { perror("dup2"); abort(); }
+        close(fd);
+        execvp(cmd, args); perror("execvp"); abort();
+      default:
+        close(fd);
+        /* do whatever the parent wants to do. */
+
+        // This code is executed by the parent process.
+        printf("Inside parent process\n");
+        
+        int wstatus, status;
+        status = waitpid(child_pid, &wstatus, 0);
+
+        if(status == -1)
+        {    
+            printf("Error: waitpid() failed");
+            return_status = false;
+        }
+        else
+        {
+            // true if the child terminated normally
+            if (WIFEXITED(wstatus)) 
+            {
+                return_status = true;
+                printf("exited, status=%d\n", WEXITSTATUS(wstatus));
+            }
+            else
+            {
+                return_status = false;
+            }
+        }
+        
+    }
 
     va_end(args);
 
