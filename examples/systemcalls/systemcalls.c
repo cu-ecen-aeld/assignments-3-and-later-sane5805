@@ -94,7 +94,7 @@ bool do_exec(int count, ...)
         if(status == -1)
         {    			
             printf("Error: execv() failed, with error :");
-            peeror("execv");
+            perror("execv");
 
             exit(EXIT_FAILURE);
         }
