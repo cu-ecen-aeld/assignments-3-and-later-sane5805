@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -171,7 +172,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
       case 0:
         if (dup2(fd, 1) < 0) { perror("dup2"); abort(); }
         close(fd);
-        execvp(cmd, args); perror("execvp"); abort();
+        execv(command[0], command); perror("execvp"); abort();
       default:
         close(fd);
         /* do whatever the parent wants to do. */
@@ -180,7 +181,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         printf("Inside parent process\n");
         
         int wstatus, status;
-        status = waitpid(child_pid, &wstatus, 0);
+        status = waitpid(kidpid, &wstatus, 0);
 
         if(status == -1)
         {    
