@@ -100,6 +100,9 @@ bool do_exec(int count, ...)
     // runs for parent
     else 
     {
+        // This code is executed by the parent process.
+        printf("Inside parent process\n");
+        
         int wstatus, status;
         status = waitpid(child_pid, &wstatus, 0);
 
