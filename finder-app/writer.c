@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
 
-    //openlog("log", LOG_PID, LOG_USER);
+    // openlog("log", LOG_PID, LOG_USER);
     
     // Check if both arguments are provided
     if (argc != 3) {
