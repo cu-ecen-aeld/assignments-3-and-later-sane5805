@@ -81,13 +81,19 @@ bool do_exec(int count, ...)
         printf("Fork failed, no child process is created");
 
         return_status = false;
+
+        return return_status;
+    }
+    else
+    {
+        printf("Child process is created successfully\n");
     }
 
     // 0 is returned in the child
     else if (child_pid == 0)
     {
         // This code is executed by the child process.
-        printf("Child process is created created successfully\n");
+        printf("Inside child process\n");
         
         int status = execv(command[0], command);
         
@@ -95,6 +101,8 @@ bool do_exec(int count, ...)
         {    
             printf("Error: execv() failed");
             return_status = false;
+
+            return return_status;
         }
     }
     // runs for parent
