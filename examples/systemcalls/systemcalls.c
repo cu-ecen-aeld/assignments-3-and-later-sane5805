@@ -122,7 +122,7 @@ bool do_exec(int count, ...)
                 return_status = true;
                 printf("exited, status=%d\n", WEXITSTATUS(wstatus));
 
-                if(WEXITSTATUS(w_status) == EXIT_SUCCESS)
+                if(WEXITSTATUS(wstatus) == EXIT_SUCCESS)
     		    {
     			    return_status = true;
     		    }
