@@ -121,6 +121,15 @@ bool do_exec(int count, ...)
             {
                 return_status = true;
                 printf("exited, status=%d\n", WEXITSTATUS(wstatus));
+
+                if(WEXITSTATUS(w_status) == EXIT_SUCCESS)
+    		    {
+    			    return_status = true;
+    		    }
+    		    else
+    		    {
+    			    return_status = false;
+    		    }
             }
             else
             {
@@ -196,6 +205,15 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
             {
                 return_status = true;
                 printf("exited, status=%d\n", WEXITSTATUS(wstatus));
+
+                if(WEXITSTATUS(w_status) == EXIT_SUCCESS)
+    		    {
+    			    return_status = true;
+    		    }
+    		    else
+    		    {
+    			    return_status = false;
+    		    }
             }
             else
             {
