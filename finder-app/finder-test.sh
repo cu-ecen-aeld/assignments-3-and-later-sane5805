@@ -51,10 +51,10 @@ then
 fi
 
 # Clean any previous build artifacts
-make clean
+# make clean
 
-echo "Compiling writer utility using native compilation"
-make
+# echo "Compiling writer utility using native compilation"
+# make
 
 for i in $( seq 1 $NUMFILES)
 do
