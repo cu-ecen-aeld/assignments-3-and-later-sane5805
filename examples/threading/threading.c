@@ -1,3 +1,10 @@
+/**
+ * Author: Saurav Negi
+ * Description: This file provides a simple multithreading example in C. It includes a function, `start_thread_obtaining_mutex`,
+ *              that creates a new thread. The thread waits for a specified time, obtains a mutex, waits for another specified time
+ *              while holding the mutex, and then releases the mutex. The thread execution is controlled by the `threadfunc` function.
+ */
+
 #include "threading.h"
 #include <unistd.h>
 #include <stdlib.h>
