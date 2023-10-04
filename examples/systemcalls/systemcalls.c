@@ -1,4 +1,8 @@
 #include "systemcalls.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -16,11 +20,21 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
-
-    return true;
+    int status = system(cmd);
+    
+    if(status == -1)
+    {    
+        printf("Error: system() failed");
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 /**
+
 * @param count -The numbers of variables passed to the function. The variables are command to execute.
 *   followed by arguments to pass to the command
 *   Since exec() does not perform path expansion, the command to execute needs
@@ -58,10 +72,75 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+    int return_status = false;
+    
+    pid_t child_pid = fork();
+    
+    // On failure, -1 is returned in the parent
+    if (child_pid == -1)
+    {
+        printf("Fork failed, no child process is created");
 
+        exit(EXIT_FAILURE);
+    }
+    
+    // 0 is returned in the child
+    else if (child_pid == 0)
+    {
+        // This code is executed by the child process.
+        printf("Inside child process\n");
+        
+        int status = execv(command[0], command);
+
+        if(status == -1)
+        {    			
+            printf("Error: execv() failed, with error :");
+            perror("execv");
+
+            exit(EXIT_FAILURE);
+        }
+    }
+    // runs for parent
+    else 
+    {
+        // This code is executed by the parent process.
+        printf("Inside parent process\n");
+        
+        int wstatus, status;
+        status = waitpid(child_pid, &wstatus, 0);
+
+        if(status == -1)
+        {    
+            printf("Error: waitpid() failed");
+            return_status = false;
+        }
+        else
+        {
+            // true if the child terminated normally
+            if (WIFEXITED(wstatus)) 
+            {
+                return_status = true;
+                printf("exited, status=%d\n", WEXITSTATUS(wstatus));
+
+                if(WEXITSTATUS(wstatus) == EXIT_SUCCESS)
+    		    {
+    			    return_status = true;
+    		    }
+    		    else
+    		    {
+    			    return_status = false;
+    		    }
+            }
+            else
+            {
+                return_status = false;
+            }
+        }
+    }
+    
     va_end(args);
 
-    return true;
+    return return_status;
 }
 
 /**
@@ -92,8 +171,59 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+    int return_status = false;
+    int kidpid;
+    int fd = open(outputfile, O_WRONLY|O_TRUNC|O_CREAT, 0644);
+    
+    if (fd < 0) { perror("open"); abort(); }
+    
+    switch (kidpid = fork()) {
+      case -1: perror("fork"); abort();
+      case 0:
+        if (dup2(fd, 1) < 0) { perror("dup2"); abort(); }
+        close(fd);
+        execv(command[0], command); perror("execvp"); abort();
+      default:
+        close(fd);
+        /* do whatever the parent wants to do. */
+
+        // This code is executed by the parent process.
+        printf("Inside parent process\n");
+        
+        int wstatus, status;
+        status = waitpid(kidpid, &wstatus, 0);
+
+        if(status == -1)
+        {    
+            printf("Error: waitpid() failed");
+            return_status = false;
+        }
+        else
+        {
+            // true if the child terminated normally
+            if (WIFEXITED(wstatus)) 
+            {
+                return_status = true;
+                printf("exited, status=%d\n", WEXITSTATUS(wstatus));
+
+                if(WEXITSTATUS(wstatus) == EXIT_SUCCESS)
+    		    {
+    			    return_status = true;
+    		    }
+    		    else
+    		    {
+    			    return_status = false;
+    		    }
+            }
+            else
+            {
+                return_status = false;
+            }
+        }
+        
+    }
 
     va_end(args);
 
-    return true;
+    return return_status;
 }
