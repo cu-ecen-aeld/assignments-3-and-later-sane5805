@@ -24,8 +24,44 @@ void sig_handler(int signo) {
 }
 
 void daemonize() {
-    // TODO: Implement daemonization
-    // ...
+    // Fork the parent process
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("Fork failed");
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        // Parent process, exit
+        exit(EXIT_SUCCESS);
+    }
+
+    // Child process: create a new session and become the session leader
+    if (setsid() < 0) {
+        perror("setsid failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Fork again to prevent the process from acquiring a controlling terminal
+    pid = fork();
+    if (pid < 0) {
+        perror("Second fork failed");
+        exit(EXIT_FAILURE);
+    }
+    if (pid > 0) {
+        // Parent of the second fork, exit
+        exit(EXIT_SUCCESS);
+    }
+
+    // Change the working directory to a safe location
+    if (chdir("/") < 0) {
+        perror("chdir failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Close standard file descriptors (stdin, stdout, stderr)
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
 }
 
 int main(int argc, char* argv[]) {
