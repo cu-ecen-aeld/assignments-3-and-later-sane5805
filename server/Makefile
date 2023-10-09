@@ -1,15 +1,15 @@
 # Makefile for aesdsocket
 
-CC = gcc
-CFLAGS = -g -Wall -Werror
+CC = $(CROSS_COMPILE)gcc
+CFLAGS = -Wall -Werror -g 
 TARGET = aesdsocket
 
 all: $(TARGET)
 
-$(TARGET): aesdsocket.c
-	$(CC) $(CFLAGS) -o $(TARGET) aesdsocket.c
+aesdsocket: aesdsocket.o
+	$(CC) $(CFLAGS) -o aesdsocket aesdsocket.o
 
 default: all
 
 clean:
-	rm -f $(TARGET)
+	rm -f *.o $(TARGET)
