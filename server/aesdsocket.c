@@ -59,7 +59,7 @@ static void signal_handler(int signo) {
 
         sig_handler_hit = true;
 
-        exit_safely();
+        // exit_safely();
             
         syslog(LOG_INFO, "Caught signal, exiting"); // Log that a signal was caught
     }
@@ -182,9 +182,9 @@ int main(int argc, char **argv)
 
     while (1) 
     {
-        // if (sig_handler_hit) {
-        //     exit_safely();
-        // }
+        if (sig_handler_hit) {
+            exit_safely();
+        }
         
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
