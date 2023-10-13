@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
 #define PORT 9000
 #define DATA_FILE "/var/tmp/aesdsocketdata"
@@ -37,6 +38,15 @@ void daemonize();
 
 int main(int argc, char **argv);
 
+void exit_safely() {
+    close(server_socket); // Close the server socket
+    close(client_socket); // Close the client socket
+    closelog(); // Close syslog
+    remove(DATA_FILE); // Remove the data file
+    exit(0); // Exit the program
+}
+
+
 /**
  * @function: signal_handler
  * @brief: Handles signals like SIGINT and SIGTERM.
@@ -48,18 +58,13 @@ static void signal_handler(int signo) {
     if (signo == SIGINT || signo == SIGTERM) {
 
         sig_handler_hit = true;
+
+        exit_safely();
             
         syslog(LOG_INFO, "Caught signal, exiting"); // Log that a signal was caught
     }
 }
 
-void exit_safely() {
-    close(server_socket); // Close the server socket
-    close(client_socket); // Close the client socket
-    closelog(); // Close syslog
-    remove(DATA_FILE); // Remove the data file
-    exit(0); // Exit the program
-}
 
 /**
  * @name: daemonize
@@ -177,9 +182,9 @@ int main(int argc, char **argv)
 
     while (1) 
     {
-        if (sig_handler_hit) {
-            exit_safely();
-        }
+        // if (sig_handler_hit) {
+        //     exit_safely();
+        // }
         
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
@@ -221,6 +226,8 @@ int main(int argc, char **argv)
                         break;
                     }
                 }
+
+                buffer[bytes_received+1] = '\0';
 
                 syslog(LOG_INFO, "Received data from %s: %s, %d", client_ip, buffer, (int)bytes_received);
 
