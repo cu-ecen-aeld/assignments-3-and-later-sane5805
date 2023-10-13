@@ -27,6 +27,8 @@ int client_socket;
 int daemon_mode = 0;
 int option_value = 1;
 
+bool sig_handler_hit = false;
+
 // Function to handle signals
 static void signal_handler(int signo);
 
@@ -44,13 +46,19 @@ int main(int argc, char **argv);
  */
 static void signal_handler(int signo) {
     if (signo == SIGINT || signo == SIGTERM) {
+
+        sig_handler_hit = true;
+            
         syslog(LOG_INFO, "Caught signal, exiting"); // Log that a signal was caught
-        close(server_socket); // Close the server socket
-        close(client_socket); // Close the client socket
-        closelog(); // Close syslog
-        remove(DATA_FILE); // Remove the data file
-        exit(0); // Exit the program
     }
+}
+
+void exit_safely() {
+    close(server_socket); // Close the server socket
+    close(client_socket); // Close the client socket
+    closelog(); // Close syslog
+    remove(DATA_FILE); // Remove the data file
+    exit(0); // Exit the program
 }
 
 /**
@@ -169,6 +177,10 @@ int main(int argc, char **argv)
 
     while (1) 
     {
+        if (sig_handler_hit) {
+            exit_safely();
+        }
+        
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
 
