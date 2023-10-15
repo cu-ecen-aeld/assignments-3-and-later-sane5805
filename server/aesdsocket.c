@@ -136,7 +136,7 @@ static void *timer_handler(void *signalno) {
 		}
 
 		// Format the timestamp
-		nt timestampLength = strftime(timestampBuffer, sizeof(timestampBuffer), "timestamp:%y %b %d	%k:%M:%S\n", time_structure);
+		int timestampLength = strftime(timestampBuffer, sizeof(timestampBuffer), "timestamp:%y %b %d	%k:%M:%S\n", time_structure);
 		if (timestampLength == 0) {
 			perror("Formating of timestamp failed");
 			exit(EXIT_FAILURE);
