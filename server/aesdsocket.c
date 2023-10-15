@@ -81,7 +81,6 @@ SLIST_HEAD(slisthead, slist_data_s) head;
 pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 
 
-// done
 void exit_safely() {
 	shutdown(server_socket, SHUT_RDWR);
 	unlink(DATA_FILE);
@@ -93,7 +92,6 @@ void exit_safely() {
     exit(0); // Exit the program
 }
 
-//done
 /**
  * @function: signal_handler
  * @brief: Handles signals like SIGINT and SIGTERM.
@@ -114,7 +112,6 @@ static void signal_handler(int signo) {
 	}
 }
 
-//done
 /**
  * @name: time_handler
  * @brief: TIMER handler function for handling time and printing time
@@ -164,7 +161,7 @@ static void *timer_handler(void *signalno) {
 		}
 
 		// Write the timestamp to the data file
-		int writeStatus = write(data_file, timestampBuffer, timer_len);
+		int writeStatus = write(data_file, timestampBuffer, timestampLength);
 
 		// Release the mutex lock
 		if (pthread_mutex_unlock(&mutex_lock) != 0) {
@@ -188,7 +185,6 @@ static void *timer_handler(void *signalno) {
 	pthread_exit(NULL);
 }
 
-// done
 /**
  * @name: thread_func
  * @brief: Thread handler function for receiving and sending data
@@ -260,7 +256,6 @@ void* thread_func(void *thread_param) {
     return thread_func_args;
 }
 
-//done
 /**
  * @name: daemonize
  * @brief: Daemonizes the process.
@@ -304,7 +299,6 @@ void daemonize() {
     close(STDERR_FILENO);
 }
 
-//done
 /**
  * @name: main
  * @brief: The main function of the server.
