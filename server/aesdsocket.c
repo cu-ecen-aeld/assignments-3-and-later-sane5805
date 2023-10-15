@@ -136,14 +136,14 @@ static void *timer_handler(void *signalno) {
 		}
 
 		// Format the timestamp
-		int timestampLength = strftime(timestampBuffer, sizeof(timestampBuffer), "timestamp:%y %b %d	%k:%M:%S\n", time_structure);
+		int timestampLength = strftime(timestampBuffer, sizeof(timestampBuffer), "timestamp:%d.%b.%y - %k:%M:%S\n", time_structure);
 		if (timestampLength == 0) {
 			perror("Formating of timestamp failed");
 			exit(EXIT_FAILURE);
 		}
 
 		// printing timestamp before dumping in file
-		printf("timestamp: %s\n", timestampBuffer);
+		// printf("timestamp: %s\n", timestampBuffer);
 
 		/* Appending timestamp onto the file */
 
