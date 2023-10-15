@@ -16,11 +16,15 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <stdbool.h>
+#include <pthread.h>
+#include <sys/time.h>
+#include "queue.h"
+#include <errno.h>
 
 #define PORT 9000
 #define DATA_FILE "/var/tmp/aesdsocketdata"
 #define BUFFER_SIZE 1024
-#define ERROR_MEMORY_ALLOC   -6
+#define ERROR_MEMORY_ALLOC -6
 #define FILE_PERMISSIONS 0644
 
 int server_socket;
@@ -28,7 +32,15 @@ int client_socket;
 int daemon_mode = 0;
 int option_value = 1;
 
+int file_fd = 0;
+// int data_count = 0;	
+
 bool sig_handler_hit = false;
+bool timer_thread_flag = false;
+
+pthread_t timer_thread = (pthread_t)NULL;
+
+void *thread_func(void *thread_parameter);
 
 // Function to handle signals
 static void signal_handler(int signo);
@@ -36,17 +48,52 @@ static void signal_handler(int signo);
 // Function to daemonize the process
 void daemonize();
 
+void socket_connect(void);
+
+void exit_safely();
+
 int main(int argc, char **argv);
 
+//  Thread parameter structure
+struct thread_data {
+	pthread_t thread_id; // ID returned by pthread_create()
+	int client_socket; // holds the current client socket identifier
+
+    /**
+     * Set to true if the thread completed with success, false
+     * if an error occurred.
+     */
+	bool thread_complete;
+};
+
+// SLIST.
+typedef struct slist_data_s slist_data_t;
+struct slist_data_s {
+	struct thread_data connection_data_node;
+	SLIST_ENTRY(slist_data_s) entries;
+};
+
+slist_data_t *datap = NULL;
+
+SLIST_HEAD(slisthead, slist_data_s) head;
+// SLIST_INIT(&head);
+
+pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
+
+
+// done
 void exit_safely() {
+	shutdown(server_socket, SHUT_RDWR);
+	unlink(DATA_FILE);
     close(server_socket); // Close the server socket
     close(client_socket); // Close the client socket
     closelog(); // Close syslog
+
     remove(DATA_FILE); // Remove the data file
     exit(0); // Exit the program
 }
 
-
+//done
 /**
  * @function: signal_handler
  * @brief: Handles signals like SIGINT and SIGTERM.
@@ -54,18 +101,166 @@ void exit_safely() {
  *    - signo: The signal number.
  * @return: None
  */
+ // done
 static void signal_handler(int signo) {
-    if (signo == SIGINT || signo == SIGTERM) {
+	if (signo == SIGINT || signo == SIGTERM) {
 
-        sig_handler_hit = true;
+		sig_handler_hit = true;
 
-        // exit_safely();
-            
-        syslog(LOG_INFO, "Caught signal, exiting"); // Log that a signal was caught
-    }
+		syslog(LOG_INFO, "Caught signal, exiting"); // Log that a signal was caught
+		
+		// called here to avoid failures in full-test
+		exit_safely();
+	}
 }
 
+//done
+/**
+ * @name: time_handler
+ * @brief: TIMER handler function for handling time and printing time
+ * @param: int signal_no : signal number
+ * @return: NULL
+ *
+ */
+static void *timer_handler(void *signalno) {
 
+	while (1)
+	{
+		char timestampBuffer[100];
+
+		// Get current time
+		time_t currentTime = time(NULL);
+
+		// Convert time to local time
+		struct tm * time_structure = localtime(&currentTime);
+		if (time_structure == NULL) {
+			perror("convertion of time to localtime failed");
+			exit(EXIT_FAILURE);
+		}
+
+		// Format the timestamp
+		int timestampLength = strftime(timestampBuffer, sizeof(timestampBuffer), "timestamp:%d.%b.%y - %k:%M:%S\n", time_structure);
+		if (timestampLength == 0) {
+			perror("Formating of timestamp failed");
+			exit(EXIT_FAILURE);
+		}
+
+		// printing timestamp before dumping in file
+		// printf("timestamp: %s\n", timestampBuffer);
+
+		/* Appending timestamp onto the file */
+
+		// Open or create the data file for writing, and append data
+		int data_file = open(DATA_FILE, O_WRONLY | O_CREAT | O_APPEND, FILE_PERMISSIONS);
+		if (data_file == -1) {
+			perror("File open failed"); // Print an error message if file open fails
+			syslog(LOG_ERR, "File open failed: %m"); // Log file open error
+			exit(EXIT_FAILURE);
+		}
+
+		// Obtain the mutex lock to protect shared resources
+		if (pthread_mutex_lock(&mutex_lock) != 0) {
+			exit(EXIT_FAILURE);
+		}
+
+		// Write the timestamp to the data file
+		int writeStatus = write(data_file, timestampBuffer, timer_len);
+
+		// Release the mutex lock
+		if (pthread_mutex_unlock(&mutex_lock) != 0) {
+			exit(EXIT_FAILURE);
+		}
+
+		if (writeStatus == -1) {
+			printf("Error writing to the file");
+			exit(EXIT_FAILURE);
+		}
+
+		// Close the data file
+		close(data_file);
+
+		// The string should be appended to the /var/tmp/aesdsocketdata file every 10 seconds.
+		// Sleep for 10 seconds before the next iteration
+		sleep(10);
+	}
+
+	// Thread completed successfully
+	pthread_exit(NULL);
+}
+
+// done
+/**
+ * @name: thread_func
+ * @brief: Thread handler function for receiving and sending data
+ * @params: void *thread_parameters: thread parameters
+ * @return: void *thread_parameters
+ */
+void* thread_func(void *thread_param) {
+
+    struct thread_data *thread_func_args = (struct thread_data *)thread_param;
+
+    char *buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE);
+    if (buffer == NULL) {
+        syslog(LOG_ERR, "Memory allocation failed"); // Log memory allocation error
+        exit(EXIT_FAILURE); // Return an error status
+    }
+    memset(buffer, 0, BUFFER_SIZE);
+
+	// Receive and append data
+    int data_file = open(DATA_FILE, O_WRONLY | O_CREAT | O_APPEND, FILE_PERMISSIONS);
+    if (data_file == -1) {
+        perror("File open failed"); // Print an error message if file open fails
+		syslog(LOG_ERR, "File open failed: %m"); // Log file open error
+        free(buffer);
+        exit(EXIT_FAILURE);
+    }
+
+	ssize_t bytes_received;
+    while ((bytes_received = recv(thread_func_args->client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
+        write(data_file, buffer, bytes_received);
+        if (memchr(buffer, '\n', bytes_received) != NULL) {
+            break;
+        }
+    }
+
+    buffer[bytes_received+1] = '\0';
+
+    syslog(LOG_INFO, "Received data from client: %s, %d", buffer, (int)bytes_received);
+
+    close(data_file);
+
+    lseek(data_file, 0, SEEK_SET);
+
+	// Send data back to the client
+    data_file = open(DATA_FILE, O_RDONLY);
+    if (data_file == -1) {
+        perror("file open failed"); // Print an error message if file open fails
+		syslog(LOG_ERR, "File open failed: %m"); // Log file open error
+        free(buffer);
+        exit(EXIT_FAILURE);
+    }
+
+    ssize_t bytes_read;
+    memset(buffer, 0, sizeof(char) * BUFFER_SIZE);
+
+    while ((bytes_read = read(data_file, buffer, sizeof(char) * BUFFER_SIZE)) > 0) {
+        send(thread_func_args->client_socket, buffer, bytes_read, 0);
+    }
+
+    free(buffer);
+    close(data_file);
+    close(thread_func_args->client_socket);
+
+    syslog(LOG_INFO, "Closed connection from client");
+
+	// Thread completed successfully
+    thread_func_args->thread_complete = true;
+    pthread_exit(thread_func_args);
+
+    return thread_func_args;
+}
+
+//done
 /**
  * @name: daemonize
  * @brief: Daemonizes the process.
@@ -109,6 +304,7 @@ void daemonize() {
     close(STDERR_FILENO);
 }
 
+//done
 /**
  * @name: main
  * @brief: The main function of the server.
@@ -117,8 +313,8 @@ void daemonize() {
  *    - argv: An array of command-line argument strings.
  * @return: 0 on success, -1 on error
  */
-int main(int argc, char **argv) 
-{
+int main(int argc, char **argv) {
+
     // Parse command-line arguments
     if (argc > 1 && strcmp(argv[1], "-d") == 0) 
     {
@@ -133,7 +329,7 @@ int main(int argc, char **argv)
     // Signal handling
     signal(SIGINT, signal_handler); // Register signal_handler for SIGINT
     signal(SIGTERM, signal_handler); // Register signal_handler for SIGTERM
-
+    
     // Daemon mode
     if (daemon_mode) 
     {
@@ -141,6 +337,10 @@ int main(int argc, char **argv)
 
         daemonize(); // Call the daemonize function to daemonize the process
     }
+
+	pthread_mutex_init(&mutex_lock, NULL);
+	
+    SLIST_INIT(&head);
 
     // Create socket
     server_socket = socket(AF_INET, SOCK_STREAM, 0); // Create a socket
@@ -172,23 +372,30 @@ int main(int argc, char **argv)
         return -1; // Return an error status
     }
 
-    // Listen for incoming connections
-    if (listen(server_socket, 1) == -1) {
-        perror("Listen failed"); // Print an error message if listen fails
-        syslog(LOG_ERR, "Listen failed: %m"); // Log listen error
-        close(server_socket); // Close the server socket
-        return -1; // Return an error status
-    }
+	// Listen for incoming connections
+	if (listen(server_socket, 10) == -1) {
+		perror("Listen failed"); // Print an error message if listen fails
+		syslog(LOG_ERR, "Listen failed: %m"); // Log listen error
+		close(server_socket); // Close the server socket
+		return -1; // Return an error status
+	}
 
-    while (1) 
+    while (!sig_handler_hit) 
     {
-        if (sig_handler_hit) {
-            exit_safely();
-        }
-        
+        // if (sig_handler_hit) {
+        //     exit_safely();
+        // }
+
+		// timer thread should run  once in parent!
+        if (!timer_thread_flag) {
+			pthread_create(&timer_thread, NULL, timer_handler, NULL);
+			timer_thread_flag = true;
+		}
+
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
-
+        
+        // Accept incoming connection
         client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
         if (client_socket == -1) {
             perror("Accept failed"); // Print an error message if accept fails
@@ -204,60 +411,46 @@ int main(int argc, char **argv)
             // Log accepted connection
             syslog(LOG_INFO, "Accepted connection from %s", client_ip);
 
-            char *buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE);
-            if (buffer == NULL) {
-                syslog(LOG_ERR, "Memory allocation failed!"); // Log memory allocation error
-                return -1; // Return an error status
-            }
+			/* rest is moved inside the thread handler */ 
+            
+			/* NODE CREATION FOR CURRENT CONNECTION */ 
+			// Allocating memory for the connection (List's node)
+		    datap = (slist_data_t *)malloc(sizeof(slist_data_t));
 
-            // Receive and append data
-            int data_file = open(DATA_FILE, O_WRONLY | O_CREAT | O_APPEND, FILE_PERMISSIONS);
-            if (data_file == -1) {
-                perror("File open failed"); // Print an error message if file open fails
-                syslog(LOG_ERR, "File open failed: %m"); // Log file open error
-                free(buffer);
-                close(client_socket);
-            }
-            else {
-                ssize_t bytes_received;
-                while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE, 0)) > 0) {
-                    write(data_file, buffer, bytes_received);
-                    if (memchr(buffer, '\n', bytes_received) != NULL) {
-                        break;
-                    }
-                }
+			// Initializing the node with current connection's data
+            datap->connection_data_node.client_socket = client_socket;
 
-                buffer[bytes_received+1] = '\0';
+			// Initially thread complete flag will be false
+            datap->connection_data_node.thread_complete = false;
 
-                syslog(LOG_INFO, "Received data from %s: %s, %d", client_ip, buffer, (int)bytes_received);
+			// Insert node in the list
+            SLIST_INSERT_HEAD(&head, datap, entries);
 
-                close(data_file);
+			// Spawning a new thread for current connection
+            pthread_create(&(datap->connection_data_node.thread_id), // ID returned by pthread_create()
+                            NULL,
+                            thread_func,
+                            &datap->connection_data_node
+		    );
 
-                lseek(data_file, 0, SEEK_SET);
+			// Joining all the completed connection threads 
+            SLIST_FOREACH(datap, &head, entries) {
+                if (datap->connection_data_node.thread_complete) {
+                    pthread_join(datap->connection_data_node.thread_id, NULL);
 
-                // Send data back to the client
-                data_file = open(DATA_FILE, O_RDONLY);
-                if (data_file == -1) {
-                    perror("file open failed"); // Print an error message if file open fails
-                    syslog(LOG_ERR, "File open failed: %m"); // Log file open error
-                    free(buffer);
-                    close(client_socket);
-                }
-                else {
-                    ssize_t bytes_read;
-                    memset(buffer, 0, sizeof(char) * BUFFER_SIZE);
+					syslog(LOG_DEBUG, "Closed connection from %s", client_ip);
+		    		printf("Closed connection from %s\n", client_ip);
 
-                    while ((bytes_read = read(data_file, buffer, sizeof(char) * BUFFER_SIZE)) > 0) {
-                        send(client_socket, buffer, bytes_read, 0);
-                    }
+					// removing the node from list and freeing it
+                    SLIST_REMOVE(&head, datap, slist_data_s, entries);
+                    free(datap);
 
-                    free(buffer);
-                    close(data_file);
-                    close(client_socket);
-
-                    syslog(LOG_INFO, "Closed connection from %s", client_ip);
+                    break;
                 }
             }
+
+            // syslog(LOG_DEBUG, "Closed connection from %s", client_ip);
+		    // printf("Closed connection from %s\n", client_ip);
         }
     }
 
@@ -266,7 +459,7 @@ int main(int argc, char **argv)
         syslog(LOG_ERR, "Error removing data file: %m"); // Log error when removing data file
     }
     close(client_socket);
-    closelog();
+	closelog();
 
     return 0;
 }
