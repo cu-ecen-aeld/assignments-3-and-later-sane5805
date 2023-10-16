@@ -1,19 +1,40 @@
-# Makefile for aesdsocket
-
+# Compiler
 CC ?= $(CROSS_COMPILE)gcc
-CFLAGS ?= -Wall -Werror -g
-
+# Flags
+CFLAGS ?= -g -Wall -Werror
+# Cross compiler variable
 CROSS_COMPILE ?=
-
-LDFLAG ?= -pthread -lrt 
+# Set target
 TARGET ?= aesdsocket
+# Set source
+SRCS ?= aesdsocket.c
+# Set object
+OBJS ?= aesdsocket.o
+# Set flags
+LDFLAGS ?= -lpthread -lrt
 
-all: $(TARGET)
+# Default build
+default: $(TARGET)
 
-aesdsocket: aesdsocket.o
-	$(CC) $(CFLAGS) -o aesdsocket aesdsocket.o $(LDFLAG)
+all: default
 
-default: all
+# Cross compile using aarch64-none-linux-gnu-gcc
+aarch64-none-linux-gnu-%:
+    $(MAKE) CROSS_COMPILE=aarch64-none-linux-gnu-
 
+# Build with appropriate compiler
+$(TARGET): $(OBJS)
+    $(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
+    
+# Build object
+$(OBJS): $(SRCS)
+    $(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
+    
+# Valgrind
+valgrind:
+    valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=/tmp/valgrind-out.txt ./aesdsocket
+
+
+# Clean target
 clean:
-	rm -f *.o $(TARGET)
+    rm -f $(TARGET) $(OBJS)
