@@ -1,9 +1,9 @@
 # Makefile for aesdsocket
 
-CC = $(CROSS_COMPILE)gcc
-CFLAGS = -Wall -Werror -g
-LDFLAG = -pthread -lrt 
-TARGET = aesdsocket
+CC ?= $(CROSS_COMPILE)gcc
+CFLAGS ?= -Wall -Werror -g
+LDFLAG ?= -pthread -lrt 
+TARGET ?= aesdsocket
 
 all: $(TARGET)
 
