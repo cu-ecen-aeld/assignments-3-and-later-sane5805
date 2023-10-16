@@ -251,7 +251,7 @@ void* thread_func(void *thread_param) {
 
 	// Thread completed successfully
     thread_func_args->thread_complete = true;
-    pthread_exit(thread_func_args);
+    // pthread_exit(thread_func_args);
 
     return thread_func_args;
 }
