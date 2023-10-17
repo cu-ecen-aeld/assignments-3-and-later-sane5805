@@ -8,7 +8,7 @@ TARGET ?= aesdsocket
 all: aesdsocket
 
 aesdsocket: aesdsocket.o
-	$(CC) $(CFLAGS) -o aesdsocket.o -o $(TARGET) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $(TARGET) aesdsocket.o $(LDFLAGS)
 
 aesdsocket.o: aesdsocket.c
 	$(CC) $(CFLAGS) -c aesdsocket.c
