@@ -1,0 +1,278 @@
+starting test with SKIP_BUILD="" and DO_VALIDATE=""
+Running test with user student
+-- Generating ;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello_Runner.c;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c from test/assignment1/Test_hello.c;test/assignment1/Test_assignment_validate.c
+-- Building executable including ;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello_Runner.c;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c test/assignment1/Test_hello.c;test/assignment1/Test_assignment_validate.c and ../examples/autotest-validate/autotest-validate.c
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/build
+[ 10%] Building C object assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o
+[ 20%] Linking C static library libunity.a
+[ 20%] Built target unity
+[ 30%] Generating ../../assignment-autotest/test/assignment1/Test_hello_Runner.c, ../../assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c, ../../assignment-autotest/test/unity_runner.c
+Test files for auto dependency generation test/assignment1/Test_hello.c test/assignment1/Test_assignment_validate.c
+Autogenerating runner for test/assignment1/Test_hello.c
+Autogenerating runner for test/assignment1/Test_assignment_validate.c
+Autogenerating test/unity_runner.c
+[ 40%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_hello.c.o
+[ 50%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate.c.o
+[ 60%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_hello_Runner.c.o
+[ 70%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate_Runner.c.o
+[ 80%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/__/examples/autotest-validate/autotest-validate.c.o
+[ 90%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/unity_runner.c.o
+[100%] Linking C executable assignment-autotest
+[100%] Built target assignment-autotest
+/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello.c:6:test_hello:INFO: Hello!  Your unity setup is working!
+/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello.c:4:test_hello:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK
+/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_assignment_validate.c:9:test_assignment_validate:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK
+Executing assignment test script
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+rm -f *.o aesdsocket
+gcc -Wall -Werror -g    -c -o aesdsocket.o aesdsocket.c
+gcc -Wall -Werror -g  -o aesdsocket aesdsocket.o
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+Testing target localhost on port 9000
+sending string abcdefg
+sending string hijklmnop
+sending string 1234567890
+sending string 9876543210
+
+Spawning three processes to ensure multithreaded writes work as expected
+Process 1 writes One best book is equal to a hundred good friends, but one good friend is equal to a library
+Process 2 writes If you want to shine like a sun, first burn like a sun
+Process 3 writes Never stop fighting until you arrive at your destined place - that is, the unique you
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 1
+Waiting for sends to compete on all processes
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 2
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 3
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 2
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 3
+Process 1 complete
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 3
+Process 3 complete
+Process 2 complete
+multithreaded test complete with success
+
+Testing the timer functionality
+No of timestamps currently in server file: 0
+No of timestamps expected after a delay of 21 seconds is 2
+No of timestamps found in file: 2
+Congrats! Tests completed with success
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+Waiting for aesdsocket application with pid 1568272 to terminate
+Re-running sockettest.sh with valgrind
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+Starting valgrind
+Waiting for aesdsocket application to start
+timestamp:wait-for-startup
+Testing target localhost on port 9000
+sending string abcdefg
+sending string hijklmnop
+sending string 1234567890
+sending string 9876543210
+
+Spawning three processes to ensure multithreaded writes work as expected
+Process 1 writes One best book is equal to a hundred good friends, but one good friend is equal to a library
+Process 2 writes If you want to shine like a sun, first burn like a sun
+Process 3 writes Never stop fighting until you arrive at your destined place - that is, the unique you
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 1
+Waiting for sends to compete on all processes
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 2
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 3
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 3
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 3
+Process 1 complete
+Process 3 complete
+Process 2 complete
+multithreaded test complete with success
+
+Testing the timer functionality
+No of timestamps currently in server file: 1
+No of timestamps expected after a delay of 21 seconds is 3
+Opening socket
+Binding socket descriptor to address
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+data packet receiving completed
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+data packet receiving completed
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+data packet receiving completed
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+data packet receiving completed
+sending
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+data packet receiving completed
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+data packet receiving completed
+sending
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+Closed connection from 127.0.0.1
+data packet receiving completed
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+Connection succesful.Accepting connection from 127.0.0.1
+Threads created now waiting to exit
+All thread exited!
+data packet receiving completed
+Closed connection from 127.0.0.1
+sending
+signal detected to exit
+Valgrind and aesdsocket complete
+deleting marker file /tmp/tmp.VWUL9gMsaH
+starting test with SKIP_BUILD="" and DO_VALIDATE=""
+Running test with user student
+-- Generating ;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello_Runner.c;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c from test/assignment1/Test_hello.c;test/assignment1/Test_assignment_validate.c
+-- Building executable including ;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello_Runner.c;/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c test/assignment1/Test_hello.c;test/assignment1/Test_assignment_validate.c and ../examples/autotest-validate/autotest-validate.c
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/build
+[ 10%] Building C object assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o
+[ 20%] Linking C static library libunity.a
+[ 20%] Built target unity
+[ 30%] Generating ../../assignment-autotest/test/assignment1/Test_hello_Runner.c, ../../assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c, ../../assignment-autotest/test/unity_runner.c
+Test files for auto dependency generation test/assignment1/Test_hello.c test/assignment1/Test_assignment_validate.c
+Autogenerating runner for test/assignment1/Test_hello.c
+Autogenerating runner for test/assignment1/Test_assignment_validate.c
+Autogenerating test/unity_runner.c
+[ 40%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_hello.c.o
+[ 50%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate.c.o
+[ 60%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_hello_Runner.c.o
+[ 70%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate_Runner.c.o
+[ 80%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/__/examples/autotest-validate/autotest-validate.c.o
+[ 90%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/unity_runner.c.o
+[100%] Linking C executable assignment-autotest
+[100%] Built target assignment-autotest
+/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello.c:6:test_hello:INFO: Hello!  Your unity setup is working!
+/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_hello.c:4:test_hello:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK
+/home/student/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment1/Test_assignment_validate.c:9:test_assignment_validate:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK
+Executing assignment test script
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+rm -f *.o aesdsocket
+gcc -Wall -Werror -g    -c -o aesdsocket.o aesdsocket.c
+gcc -Wall -Werror -g  -o aesdsocket aesdsocket.o
+~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/server ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805/assignment-autotest/test/assignment6 ~/AESD/assignment-1-sane5805/assignments-3-and-later-sane5805
+Testing target localhost on port 9000
+sending string abcdefg
+sending string hijklmnop
+sending string 1234567890
+sending string 9876543210
+
+Spawning three processes to ensure multithreaded writes work as expected
+Process 1 writes One best book is equal to a hundred good friends, but one good friend is equal to a library
+Process 2 writes If you want to shine like a sun, first burn like a sun
+Process 3 writes Never stop fighting until you arrive at your destined place - that is, the unique you
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 1
+Waiting for sends to compete on all processes
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 2
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 1: instance 3
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 3
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 3
+Process 1 complete
+Process 2 complete
+Process 3 complete
+multithreaded test complete with success
+
+Testing the timer functionality
+No of timestamps currently in server file: 0
+No of timestamps expected after a delay of 21 seconds is 2

@@ -1,15 +1,20 @@
 # Makefile for aesdsocket
 
-CC = $(CROSS_COMPILE)gcc
-CFLAGS = -Wall -Werror -g 
-TARGET = aesdsocket
+CC ?= $(CROSS_COMPILE)gcc
+CFLAGS ?= -g -Wall -Werror
+CROSS_COMPILE ?=
+TARGET ?= aesdsocket
+LDFLAGS ?= -lpthread -lrt
 
-all: $(TARGET)
+default: $(TARGET)
+
+all: default
 
 aesdsocket: aesdsocket.o
-	$(CC) $(CFLAGS) -o aesdsocket aesdsocket.o
-
-default: all
-
+	$(CC) $(CFLAGS) -o $(TARGET) aesdsocket.o $(LDFLAGS)
+    
+aesdsocket.o: aesdsocket.c
+	$(CC) $(CFLAGS) -c aesdsocket.c -o aesdsocket.o
+    
 clean:
-	rm -f *.o $(TARGET)
+	rm -f $(TARGET) aesdsocket.o
