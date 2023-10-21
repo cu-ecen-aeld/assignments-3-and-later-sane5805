@@ -29,9 +29,33 @@
 struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct aesd_circular_buffer *buffer,
             size_t char_offset, size_t *entry_offset_byte_rtn )
 {
-    /**
-    * TODO: implement per description
-    */
+    size_t curr_char_offs = 0;
+    int element_idx = buffer->out_offs;
+
+    if (buffer->out_offs == buffer->in_offs && buffer->full == false) {
+        // The circular buffer is empty, so there's no data to return.
+        return NULL;
+    }
+
+    do {
+        int curr_ele_size = buffer->entry[element_idx].size;
+
+        // check if current element will contain that offset?
+        if(curr_char_offs + curr_ele_size > char_offset) {
+            // element is found!
+            *entry_offset_byte_rtn = char_offset - curr_char_offs;
+                
+            return &(buffer->entry[element_idx]);   	    
+        }
+        else {
+            curr_char_offs += buffer->entry[element_idx].size; 
+        }    
+
+        // jump to next element of the buffer
+        element_idx = (element_idx + 1) % AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED;
+
+    } while(element_idx != buffer->in_offs);
+
     return NULL;
 }
 
@@ -44,9 +68,20 @@ struct aesd_buffer_entry *aesd_circular_buffer_find_entry_offset_for_fpos(struct
 */
 void aesd_circular_buffer_add_entry(struct aesd_circular_buffer *buffer, const struct aesd_buffer_entry *add_entry)
 {
-    /**
-    * TODO: implement per description
-    */
+    // Adding the new entry irrespective of the state of the buffer (as overwrite is allowed)
+    buffer->entry[buffer->in_offs] = *(add_entry); 
+
+    // In the case of full buffer we have to increase the out_offs as now the 2nd last element is 
+    // the last pushed element
+    if (true == buffer->full) {
+        buffer->out_offs = (buffer->out_offs + 1) % AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED;
+    }
+
+    // incrementing in_offs in all situations as the new element will be added in every invokation
+    buffer->in_offs = (buffer->in_offs + 1) % (AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED);
+
+    // updating the buffer full status after every invokation
+    buffer->full = (buffer->in_offs == buffer->out_offs) ? true : false;
 }
 
 /**
