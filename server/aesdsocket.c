@@ -22,10 +22,22 @@
 #include <errno.h>
 
 #define PORT 9000
+
 #define DATA_FILE "/var/tmp/aesdsocketdata"
+
 #define BUFFER_SIZE 1024
 #define ERROR_MEMORY_ALLOC -6
 #define FILE_PERMISSIONS 0644
+
+#define USE_AESD_CHAR_DEVICE 1
+
+#ifdef USE_AESD_CHAR_DEVICE
+char *file_path = "/dev/aesdchar";
+#endif
+
+#ifndef USE_AESD_CHAR_DEVICE
+char *file_path = "/var/tmp/aesdsocketdata";
+#endif
 
 int server_socket;
 int client_socket;
@@ -36,9 +48,14 @@ int file_fd = 0;
 // int data_count = 0;	
 
 bool sig_handler_hit = false;
-bool timer_thread_flag = false;
 
+#ifndef USE_AESD_CHAR_DEVICE
+bool timer_thread_flag = false;
+#endif
+
+#ifndef USE_AESD_CHAR_DEVICE
 pthread_t timer_thread = (pthread_t)NULL;
+#endif
 
 void *thread_func(void *thread_parameter);
 
@@ -89,6 +106,13 @@ void exit_safely() {
     closelog(); // Close syslog
 
     remove(DATA_FILE); // Remove the data file
+
+#ifndef USE_AESD_CHAR_DEVICE
+	if (timer_thread) s{
+		pthread_join(timer_thread, NULL);
+	}
+#endif
+
     exit(0); // Exit the program
 }
 
@@ -119,6 +143,7 @@ static void signal_handler(int signo) {
  * @return: NULL
  *
  */
+#ifndef USE_AESD_CHAR_DEVICE
 static void *timer_handler(void *signalno) {
 
 	while (1)
@@ -184,6 +209,7 @@ static void *timer_handler(void *signalno) {
 	// Thread completed successfully
 	pthread_exit(NULL);
 }
+#endif
 
 /**
  * @name: thread_func
@@ -381,10 +407,12 @@ int main(int argc, char **argv) {
         // }
 
 		// timer thread should run  once in parent!
+        #ifndef USE_AESD_CHAR_DEVICE
         if (!timer_thread_flag) {
 			pthread_create(&timer_thread, NULL, timer_handler, NULL);
 			timer_thread_flag = true;
 		}
+        #endif
 
         struct sockaddr_in client_addr;
         socklen_t client_len = sizeof(client_addr);
@@ -454,6 +482,12 @@ int main(int argc, char **argv) {
     }
     close(client_socket);
 	closelog();
+
+#ifndef USE_AESD_CHAR_DEVICE
+	if (timer_thread) s{
+		pthread_join(timer_thread, NULL);
+	}
+#endif
 
     return 0;
 }
