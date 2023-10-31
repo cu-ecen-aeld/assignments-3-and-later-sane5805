@@ -240,12 +240,12 @@ void aesd_cleanup_module(void)
 
     // free circular buffer entries
     struct aesd_buffer_entry *entry = NULL;
-    //uint8_t index = 0;
+    uint8_t index = 0;
 
     // freeing buffer
     kfree(aesd_device.circle_buff_entry.buffptr);
 
-    AESD_CIRCULAR_BUFFER_FOREACH(entry, &aesd_device.circle_buff, 0) {
+    AESD_CIRCULAR_BUFFER_FOREACH(entry, &aesd_device.circle_buff, index) {
 
         if (entry->buffptr != NULL) {
             kfree(entry->buffptr);
