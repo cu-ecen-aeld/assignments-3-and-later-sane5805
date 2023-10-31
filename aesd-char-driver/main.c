@@ -25,7 +25,7 @@ int aesd_minor =   0;
 MODULE_AUTHOR("Saurav Negi"); /** TODO: fill in your name **/
 MODULE_LICENSE("Dual BSD/GPL");
 
-//struct aesd_dev aesd_device;
+struct aesd_dev aesd_device;
 
 int aesd_open(struct inode *inode, struct file *filp)
 {
