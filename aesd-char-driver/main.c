@@ -20,7 +20,7 @@
 #include <linux/slab.h>
 #include "aesdchar.h"
 int aesd_major =   0; // use dynamic major
-//int aesd_minor =   0;
+int aesd_minor =   0;
 
 MODULE_AUTHOR("Saurav Negi"); /** TODO: fill in your name **/
 MODULE_LICENSE("Dual BSD/GPL");
