@@ -17,6 +17,7 @@
 #include <linux/types.h>
 #include <linux/cdev.h>
 #include <linux/fs.h> // file_operations
+#include <linux/slab.h>
 #include "aesdchar.h"
 int aesd_major =   0; // use dynamic major
 int aesd_minor =   0;
@@ -77,7 +78,7 @@ ssize_t aesd_read(struct file *filp, char __user *buf, size_t count,
     ssize_t read_offset = 0;
 
     // Find the entry and offset for the given file position
-    read_entry = aesd_circular_buffer_find_entry_offset_for_fpos(&(dev->circle_buff), *f_pos, &read_offset);
+    read_entry = aesd_circular_buffer_find_entry_offset_for_fpos(&(device->circle_buff), *f_pos, &read_offset);
     if (!read_entry) {
         goto error_handling;
     }
