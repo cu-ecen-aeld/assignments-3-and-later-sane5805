@@ -227,7 +227,7 @@ int aesd_init_module(void)
 
     if( result ) {
         unregister_chrdev_region(dev, 1);
-    
+    }
     return result;
 
 }
