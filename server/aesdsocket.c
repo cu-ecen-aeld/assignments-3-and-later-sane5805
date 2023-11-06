@@ -110,7 +110,7 @@ void exit_safely() {
     remove(DATA_FILE); // Remove the data file
 
 #ifndef USE_AESD_CHAR_DEVICE
-	if (timer_thread) s{
+	if (timer_thread) {
 		pthread_join(timer_thread, NULL);
 	}
 #endif
@@ -595,7 +595,7 @@ int main(int argc, char **argv) {
 	closelog();
 
 #ifndef USE_AESD_CHAR_DEVICE
-	if (timer_thread) s{
+	if (timer_thread) {
 		pthread_join(timer_thread, NULL);
 	}
 #endif
