@@ -1,6 +1,7 @@
 # See example Makefile from scull project
 # Comment/uncomment the following line to disable/enable debugging
 #DEBUG = y
+CONFIG_MODULE_SIG=n
 
 # Add your debugging flag (or not) to CFLAGS
 ifeq ($(DEBUG),y)

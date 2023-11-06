@@ -20,10 +20,11 @@
 #include <sys/time.h>
 #include "queue.h"
 #include <errno.h>
+#include "./../aesd-char-driver/aesd_ioctl.h"
 
 #define PORT 9000
 
-#define DATA_FILE "/var/tmp/aesdsocketdata"
+// #define DATA_FILE "/var/tmp/aesdsocketdata"
 
 #define BUFFER_SIZE 1024
 #define ERROR_MEMORY_ALLOC -6
@@ -32,11 +33,11 @@
 #define USE_AESD_CHAR_DEVICE 1
 
 #ifdef USE_AESD_CHAR_DEVICE
-char *file_path = "/dev/aesdchar";
+char *DATA_FILE = "/dev/aesdchar";
 #endif
 
 #ifndef USE_AESD_CHAR_DEVICE
-char *file_path = "/var/tmp/aesdsocketdata";
+char *DATA_FILE = "/var/tmp/aesdsocketdata";
 #endif
 
 int server_socket;
@@ -46,6 +47,7 @@ int option_value = 1;
 
 int file_fd = 0;
 // int data_count = 0;	
+// int msg_flag = 0;
 
 bool sig_handler_hit = false;
 
@@ -100,7 +102,7 @@ pthread_mutex_t mutex_lock = PTHREAD_MUTEX_INITIALIZER;
 
 void exit_safely() {
 	shutdown(server_socket, SHUT_RDWR);
-	unlink(DATA_FILE);
+	// unlink(DATA_FILE);
     close(server_socket); // Close the server socket
     close(client_socket); // Close the client socket
     closelog(); // Close syslog
@@ -253,31 +255,139 @@ void* thread_func(void *thread_param) {
 
     lseek(data_file, 0, SEEK_SET);
 
-	// Send data back to the client
-    data_file = open(DATA_FILE, O_RDONLY);
-    if (data_file == -1) {
-        perror("file open failed"); // Print an error message if file open fails
-		syslog(LOG_ERR, "File open failed: %m"); // Log file open error
-        free(buffer);
-        exit(EXIT_FAILURE);
-    }
 
-    ssize_t bytes_read;
-    memset(buffer, 0, sizeof(char) * BUFFER_SIZE);
+#ifdef USE_AESD_CHAR_DEVICE
 
-    while ((bytes_read = read(data_file, buffer, sizeof(char) * BUFFER_SIZE)) > 0) {
-        send(thread_func_args->client_socket, buffer, bytes_read, 0);
-    }
+	while (1)
+	{
+		if (strncmp(output_buffer, "AESDCHAR_IOCSEEKTO:", strlen("AESDCHAR_IOCSEEKTO:")) == 0) // checking for command
+		{
+			printf("seekto command found \n");
 
-    free(buffer);
-    close(data_file);
-    close(thread_func_args->client_socket);
+			struct aesd_seekto seekto;
+			char *token = strtok(output_buffer + strlen("AESDCHAR_IOCSEEKTO:"), ",");
+			if (token == NULL)
+			{
+				syslog(LOG_DEBUG, "Error: Invalid write command\n");
+				exit_func();
+			}
 
-    syslog(LOG_INFO, "Closed connection from client");
+            // extracting write command and write command offset
+			seekto.write_cmd = strtoul(token, NULL, 10);
+			token = strtok(NULL, ",");
+			if (token == NULL)
+			{
+				syslog(LOG_DEBUG, "Error: Invalid write command\n");
+				exit_func();
+			}
+			seekto.write_cmd_offset = strtoul(token, NULL, 10);
 
-	// Thread completed successfully
-    thread_func_args->thread_complete = true;
-    // pthread_exit(thread_func_args);
+			syslog(LOG_DEBUG, "Command found:%s :%u, %u\n", "AESDCHAR_IOCSEEKTO", seekto.write_cmd, seekto.write_cmd_offset);
+
+            // check for successful ioctl command
+			if (ioctl(file_fd, AESDCHAR_IOCSEEKTO, &seekto) != 0)
+			{
+				syslog(LOG_DEBUG, "ioctl failed\n");
+				exit_func();
+			}
+			else
+			{
+				syslog(LOG_DEBUG, "ioctl successful\n");
+				printf("ioctl successful\n");
+			}
+		}
+
+#endif
+// Step-6 Write the data received from client to the server
+		else
+		{
+#ifndef USE_AESD_CHAR_DEVICE
+			ret = pthread_mutex_lock(&mutex_lock);
+
+			if (ret)
+			{
+				printf("Mutex lock error before write\n");
+				exit(1);
+			}
+#endif
+			syslog(LOG_DEBUG, "writing to file \n");
+			// printf("output buffer is %s\n", output_buffer);
+			int writeret = write(file_fd, output_buffer, strlen(output_buffer));
+
+			if (writeret == -1)
+			{
+				printf("Error write\n");
+				exit(1);
+			}
+
+#ifndef USE_AESD_CHAR_DEVICE
+			ret = pthread_mutex_unlock(&mutex_lock);
+
+			if (ret)
+			{
+				printf("Mutex unlock error after read/send\n");
+				exit(1);
+			}
+#endif
+		}
+		break;
+	}
+
+
+	// Step-7 Reading from the file & Sending to the client with the accept fd
+	char send_buffer[BUFFER_SIZE];
+	memset(&send_buffer[0], 0, BUFFER_SIZE);
+	syslog(LOG_DEBUG, "reading from file n");
+	while (1)
+	{// for reading and writing to socket
+
+		ret = read(file_fd, send_buffer, BUFFER_SIZE);
+        // read until no characters left
+		if (ret <= 0)
+			break;
+
+		write(params->client_fd, send_buffer, ret);// send back to socket
+	}
+	printf("send buffer is %s\n", send_buffer);
+
+	// exit_thread:
+	close(file_fd);
+	params->thread_complete = true;
+
+	close(params->client_fd);
+	// Free the allocated buffer
+	free(output_buffer);
+
+    // else {
+	// // Send data back to the client
+    // data_file = open(DATA_FILE, O_RDONLY);
+    // if (data_file == -1) {
+    //     perror("file open failed"); // Print an error message if file open fails
+	// 	syslog(LOG_ERR, "File open failed: %m"); // Log file open error
+    //     free(buffer);
+    //     exit(EXIT_FAILURE);
+    // }
+
+    // ssize_t bytes_read;
+    // memset(buffer, 0, sizeof(char) * BUFFER_SIZE);
+
+    // while ((bytes_read = read(data_file, buffer, sizeof(char) * BUFFER_SIZE)) > 0) {
+    //     send(thread_func_args->client_socket, buffer, bytes_read, 0);
+    // }
+
+    // close(data_file);
+
+	// // Thread completed successfully
+    // thread_func_args->thread_complete = true;
+    // // pthread_exit(thread_func_args);
+
+    // }
+
+    // free(buffer);
+    
+    // close(thread_func_args->client_socket);
+
+    // syslog(LOG_INFO, "Closed connection from client");
 
     return thread_func_args;
 }
