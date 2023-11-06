@@ -347,7 +347,7 @@ void* thread_func(void *thread_param) {
 		if (ret <= 0)
 			break;
 
-		write(thread_func_args->client_fd, send_buffer, ret);// send back to socket
+		write(thread_func_args->client_socket, send_buffer, ret);// send back to socket
 	}
 	printf("send buffer is %s\n", send_buffer);
 
@@ -355,7 +355,7 @@ void* thread_func(void *thread_param) {
 	close(file_fd);
 	thread_func_args->thread_complete = true;
 
-	close(thread_func_args->client_fd);
+	close(thread_func_args->client_socket);
 	// Free the allocated buffer
 	free(output_buffer);
 
