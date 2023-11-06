@@ -120,7 +120,7 @@ void exit_safely() {
     close(client_socket); // Close the client socket
     closelog(); // Close syslog
 
-    remove(DATA_FILE); // Remove the data file
+    remove(file_path); // Remove the data file
 
 #ifndef USE_AESD_CHAR_DEVICE
 	if (timer_thread) {
@@ -188,7 +188,7 @@ static void *timer_handler(void *signalno) {
 		/* Appending timestamp onto the file */
 
 		// Open or create the data file for writing, and append data
-		int data_file = open(DATA_FILE, O_WRONLY | O_CREAT | O_APPEND, FILE_PERMISSIONS);
+		int data_file = open(file_path, O_WRONLY | O_CREAT | O_APPEND, FILE_PERMISSIONS);
 		if (data_file == -1) {
 			perror("File open failed"); // Print an error message if file open fails
 			syslog(LOG_ERR, "File open failed: %m"); // Log file open error
