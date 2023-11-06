@@ -57,7 +57,7 @@ char *server_port = "9000"; // given port for communication
 int socket_fd = 0;			// socket file descriptor
 int accept_fd = 0;			// client accept file descriptor
 int data_count = 0;			// for counting the data packet bytes
-int file_fd = 0;			// file as defined in path to be created
+// int file_fd = 0;			// file as defined in path to be created
 bool process_flag = false;
 int deamon_flag = 0;
 
