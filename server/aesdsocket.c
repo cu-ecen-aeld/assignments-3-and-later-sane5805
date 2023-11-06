@@ -245,7 +245,7 @@ void *thread_func(void *thread_parameter)
 	// char *send_buffer = NULL;
 
 	// get the parameter of the thread
-	thread_ipc *params = (thread_ipc *)thread_parameter;
+	struct thread_data *params = (struct thread_data *)thread_parameter;
 
 	// For test
 	output_buffer = (char *)malloc(sizeof(char) * BUFFER_SIZE);
