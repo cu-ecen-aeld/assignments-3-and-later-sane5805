@@ -258,6 +258,7 @@ void* thread_func(void *thread_param) {
 
 #ifdef USE_AESD_CHAR_DEVICE
 
+    char* output_buffer = NULL;
 	while (1)
 	{
 		if (strncmp(output_buffer, "AESDCHAR_IOCSEEKTO:", strlen("AESDCHAR_IOCSEEKTO:")) == 0) // checking for command
@@ -269,7 +270,7 @@ void* thread_func(void *thread_param) {
 			if (token == NULL)
 			{
 				syslog(LOG_DEBUG, "Error: Invalid write command\n");
-				exit_func();
+				exit_safely();
 			}
 
             // extracting write command and write command offset
@@ -278,7 +279,7 @@ void* thread_func(void *thread_param) {
 			if (token == NULL)
 			{
 				syslog(LOG_DEBUG, "Error: Invalid write command\n");
-				exit_func();
+				exit_safely();
 			}
 			seekto.write_cmd_offset = strtoul(token, NULL, 10);
 
@@ -288,7 +289,7 @@ void* thread_func(void *thread_param) {
 			if (ioctl(file_fd, AESDCHAR_IOCSEEKTO, &seekto) != 0)
 			{
 				syslog(LOG_DEBUG, "ioctl failed\n");
-				exit_func();
+				exit_safely();
 			}
 			else
 			{
@@ -341,20 +342,20 @@ void* thread_func(void *thread_param) {
 	while (1)
 	{// for reading and writing to socket
 
-		ret = read(file_fd, send_buffer, BUFFER_SIZE);
+		int ret = read(file_fd, send_buffer, BUFFER_SIZE);
         // read until no characters left
 		if (ret <= 0)
 			break;
 
-		write(params->client_fd, send_buffer, ret);// send back to socket
+		write(thread_func_args->client_fd, send_buffer, ret);// send back to socket
 	}
 	printf("send buffer is %s\n", send_buffer);
 
 	// exit_thread:
 	close(file_fd);
-	params->thread_complete = true;
+	thread_func_args->thread_complete = true;
 
-	close(params->client_fd);
+	close(thread_func_args->client_fd);
 	// Free the allocated buffer
 	free(output_buffer);
 
