@@ -324,7 +324,7 @@ void *thread_func(void *thread_parameter)
 			if (token == NULL)
 			{
 				syslog(LOG_DEBUG, "Error: Invalid write command\n");
-				exit_func();
+				exit_safely();
 			}
 			// extracting write command and write command offset
 			seekto.write_cmd = strtoul(token, NULL, 10);
@@ -967,13 +967,13 @@ void socket_connect()
 		SLIST_INSERT_HEAD(&head, datap, entries);
 
 		// Inserting thread parameters now
-		datap->thread_socket.client_fd = accept_fd;
-		datap->thread_socket.thread_complete = false;
-
-		pthread_create(&(datap->thread_socket.thread_id), // the thread id to be created
+		datap->connection_data_node.client_socket = accept_fd;
+		datap->connection_data_node.thread_complete = false;
+s
+		pthread_create(&(datap->connection_data_node.thread_id), // the thread id to be created
 					   NULL,							  // the thread attribute to be passed
 					   thread_func,					  // the thread handler to be executed
-					   &datap->thread_socket			  // the thread parameter to be passed
+					   &datap->connection_data_node			  // the thread parameter to be passed
 		);
 
 		printf("Threads created now waiting to exit\n");
@@ -983,7 +983,7 @@ void socket_connect()
 
 			if (datap->thread_socket.thread_complete == true)
 			{
-				pthread_join(datap->thread_socket.thread_id, NULL);
+				pthread_join(datap->connection_data_node.thread_id, NULL);
 				SLIST_REMOVE(&head, datap, slist_data_s, entries);
 				free(datap);
 				break;
