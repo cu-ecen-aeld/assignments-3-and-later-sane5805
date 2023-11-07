@@ -263,7 +263,7 @@ void *thread_func(void *thread_parameter)
 
 		// printf("Receiving data from descriptor:%d.\n",sfd);
 
-		ret_recv = recv(params->client_fd, buff, BUFFER_SIZE, 0); //**!check the flag
+		ret_recv = recv(params->client_socket, buff, BUFFER_SIZE, 0); //**!check the flag
 		if (ret_recv < 0)
 		{
 			printf("Error while receving data packets\n");
@@ -395,7 +395,7 @@ void *thread_func(void *thread_parameter)
 		if (ret <= 0)
 			break;
 
-		send(params->client_fd, send_buffer, strlen(send_buffer), 0); // send back to socket
+		send(params->client_socket, send_buffer, strlen(send_buffer), 0); // send back to socket
 	}
 	// printf("send buffer is %s\n", send_buffer);
 
@@ -403,7 +403,7 @@ void *thread_func(void *thread_parameter)
 	close(file_fd);
 	params->thread_complete = true;
 
-	close(params->client_fd);
+	close(params->client_socket);
 	// Free the allocated buffer
 	free(output_buffer);
 
