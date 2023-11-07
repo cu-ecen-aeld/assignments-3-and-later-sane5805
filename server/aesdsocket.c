@@ -332,7 +332,7 @@ void *thread_func(void *thread_parameter)
 			if (token == NULL)
 			{
 				syslog(LOG_DEBUG, "Error: Invalid write command\n");
-				exit_func();
+				exit_safely();
 			}
 			seekto.write_cmd_offset = strtoul(token, NULL, 10);
 
@@ -341,7 +341,7 @@ void *thread_func(void *thread_parameter)
 			if (ioctl(file_fd, AESDCHAR_IOCSEEKTO, &seekto) != 0)
 			{
 				syslog(LOG_DEBUG, "ioctl failed\n");
-				exit_func();
+				exit_safely();
 			}
 			else
 			{
