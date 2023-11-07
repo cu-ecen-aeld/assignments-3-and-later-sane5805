@@ -969,7 +969,7 @@ void socket_connect()
 		// Inserting thread parameters now
 		datap->connection_data_node.client_socket = accept_fd;
 		datap->connection_data_node.thread_complete = false;
-s
+
 		pthread_create(&(datap->connection_data_node.thread_id), // the thread id to be created
 					   NULL,							  // the thread attribute to be passed
 					   thread_func,					  // the thread handler to be executed
@@ -981,7 +981,7 @@ s
 		SLIST_FOREACH(datap, &head, entries)
 		{
 
-			if (datap->thread_socket.thread_complete == true)
+			if (datap->connection_data_node.thread_complete == true)
 			{
 				pthread_join(datap->connection_data_node.thread_id, NULL);
 				SLIST_REMOVE(&head, datap, slist_data_s, entries);
