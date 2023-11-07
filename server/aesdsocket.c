@@ -20,6 +20,7 @@
 #include <sys/time.h>
 #include "queue.h"
 #include <errno.h>
+#include <netdb.h>
 #include "./../aesd-char-driver/aesd_ioctl.h"
 
 #define PORT 9000
@@ -971,7 +972,7 @@ void socket_connect()
 
 		pthread_create(&(datap->thread_socket.thread_id), // the thread id to be created
 					   NULL,							  // the thread attribute to be passed
-					   thread_handler,					  // the thread handler to be executed
+					   thread_func,					  // the thread handler to be executed
 					   &datap->thread_socket			  // the thread parameter to be passed
 		);
 
