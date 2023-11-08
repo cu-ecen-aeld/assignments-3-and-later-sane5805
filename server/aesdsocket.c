@@ -753,15 +753,15 @@ void socket_connect()
 	// free after use
 	freeaddrinfo(res);
 
-	if (deamon_flag == 1)
-	{
-		int temp_daemon = daemon(0, 0);
-		if (temp_daemon == -1)
-		{
-			printf("Couldn't process into deamon mode\n");
-			syslog(LOG_ERR, "failed to enter deamon mode %s", strerror(errno));
-		}
-	}
+	// if (deamon_flag == 1)
+	// {
+	// 	int temp_daemon = daemon(0, 0);
+	// 	if (temp_daemon == -1)
+	// 	{
+	// 		printf("Couldn't process into deamon mode\n");
+	// 		syslog(LOG_ERR, "failed to enter deamon mode %s", strerror(errno));
+	// 	}
+	// }
 #ifndef USE_AESD_CHAR_DEVICE
 	bool timer_thread_flag = false;
 #endif
