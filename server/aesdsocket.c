@@ -591,7 +591,7 @@ int main(int argc, char **argv) {
     }
 
     close(server_socket);
-    if (unlink(DATA_FILE) == -1) {
+    if (unlink(file_path) == -1) {
         syslog(LOG_ERR, "Error removing data file: %m"); // Log error when removing data file
     }
     close(client_socket);
