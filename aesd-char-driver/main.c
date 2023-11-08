@@ -16,9 +16,12 @@
 #include <linux/printk.h>
 #include <linux/types.h>
 #include <linux/cdev.h>
-#include <linux/fs.h> // file_operations
+#include <linux/fs.h>
 #include <linux/slab.h>
+#include <linux/uaccess.h>
 #include "aesdchar.h"
+#include "aesd_ioctl.h"
+
 int aesd_major =   0; // use dynamic major
 int aesd_minor =   0;
 
@@ -178,12 +181,138 @@ error_handling_write:
     return retval;
 }
 
+
+static long aesd_adjust_file_offset(struct file *filp, unsigned int write_cmd, unsigned int write_cmd_offset)
+{
+    uint8_t position = 0;
+    long result = 0;
+    struct aesd_buffer_entry *entry = NULL;
+    struct aesd_dev *device = NULL;
+
+    device = filp->private_data;
+
+    if (filp == NULL) { return -EFAULT; }
+
+    if (mutex_lock_interruptible(&(device->lock))) {
+
+        PDEBUG(KERN_ERR "Unable to acquire mutex lock");
+
+        return -ERESTARTSYS;
+    }
+
+    AESD_CIRCULAR_BUFFER_FOREACH(entry, &device->circle_buff, position);
+    
+    if (write_cmd > position || write_cmd_offset >= (device->circle_buff.entry[write_cmd].size) || write_cmd > AESDCHAR_MAX_WRITE_OPERATIONS_SUPPORTED) {
+        result = -EINVAL;
+    }
+    else {
+
+        if (!write_cmd) {
+
+            filp->f_pos += write_cmd_offset;
+        }
+        else
+        {
+            for (position = 0; position < write_cmd; position++) {
+
+                filp->f_pos += device->circle_buff.entry[position].size;
+            }
+
+            filp->f_pos += write_cmd_offset;
+        }
+    }
+
+    mutex_unlock(&device->lock);
+  
+    return result;
+}
+
+
+long aesd_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+{
+    int error_code = 0;
+    long result = 0;
+    struct aesd_seekto custom_seek;
+
+    if(filp == NULL) { return -EFAULT; }
+    
+    if((_IOC_TYPE(cmd) != AESD_IOC_MAGIC) || (_IOC_NR(cmd) > AESDCHAR_IOC_MAXNR)) { return -ENOTTY; }
+       
+
+    if((_IOC_DIR(cmd) & _IOC_WRITE) || (_IOC_DIR(cmd) & _IOC_READ)) {
+
+        error_code = !access_ok((void __user *)arg, _IOC_SIZE(cmd));
+
+
+    }
+
+    if(error_code) { return -EFAULT; }
+
+    switch (cmd)
+    {
+        case AESDCHAR_IOCSEEKTO:
+
+            if (copy_from_user(&custom_seek, (const void __user *)arg, sizeof(custom_seek))) {
+
+                result = -EFAULT;
+            }       
+            else {
+
+                result = aesd_adjust_file_offset(filp, custom_seek.write_cmd, custom_seek.write_cmd_offset);
+            }
+            break;
+
+        default: 
+            return -ENOTTY;
+            break;
+    }
+
+    return result;
+}
+
+
+loff_t aesd_llseek(struct file *filp, loff_t offset, int whence)
+{
+    loff_t total_buffer_size  = 0;
+    loff_t seek_position = 0;
+    uint8_t entry_index  = 0;
+    
+    struct aesd_dev * device = NULL;
+    struct aesd_buffer_entry *seek_entry = NULL;
+
+
+    device = (struct aesd_dev *)filp->private_data;
+
+    if (filp == NULL) { return -EFAULT; }
+
+
+    if (mutex_lock_interruptible(&(device->lock))) {
+
+        PDEBUG(KERN_ERR "Mutex lock was not acquired");
+        return -ERESTARTSYS;
+    }
+
+    AESD_CIRCULAR_BUFFER_FOREACH(seek_entry, &device->circle_buff, entry_index) {
+
+        total_buffer_size  += seek_entry->size;
+    }
+
+    seek_position = fixed_size_llseek(filp, offset, whence, total_buffer_size);
+
+    mutex_unlock(&device->lock);
+
+    return seek_position;
+}
+
+
 struct file_operations aesd_fops = {
-    .owner =    THIS_MODULE,
-    .read =     aesd_read,
-    .write =    aesd_write,
-    .open =     aesd_open,
-    .release =  aesd_release,
+    .owner =            THIS_MODULE,
+    .read =             aesd_read,
+    .write =            aesd_write,
+    .open =             aesd_open,
+    .release =          aesd_release,
+    .llseek =           aesd_llseek,
+    .unlocked_ioctl =   aesd_ioctl
 };
 
 static int aesd_setup_cdev(struct aesd_dev *dev)
