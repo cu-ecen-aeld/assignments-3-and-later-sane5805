@@ -2,6 +2,7 @@
  * @name: aesdsocket.c
  * @brief: A socket program for a server in stream mode.
  * @author: Saurav Negi
+ * @reference: ayswariya088 submission for the same assignment
  */
 
 #include <stdio.h>
@@ -43,7 +44,7 @@ char *file_path = "/dev/aesdchar";
 char *file_path = "/var/tmp/aesdsocketdata";
 #endif
 
-#define MAX_BACKLOG (10)
+#define MAX_BACKLOG		10
 
 int server_socket;
 int client_socket;
@@ -51,12 +52,9 @@ int daemon_mode = 0;
 int option_value = 1;
 
 int file_fd = 0;
-// int data_count = 0;	
-// int msg_flag = 0;
 
-char *server_port = "9000"; // given port for communication
-int data_count = 0;			// for counting the data packet bytes
-// int file_fd = 0;			// file as defined in path to be created
+char *server_port = "9000";
+int data_count = 0;
 bool process_flag = false;
 int deamon_flag = 0;
 
