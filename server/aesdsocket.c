@@ -60,7 +60,7 @@ int accept_fd = 0;			// client accept file descriptor
 int data_count = 0;			// for counting the data packet bytes
 // int file_fd = 0;			// file as defined in path to be created
 bool process_flag = false;
-int deamon_flag = 0;
+// int deamon_flag = 0;
 
 
 bool sig_handler_hit = false;
@@ -447,7 +447,193 @@ void daemonize() {
  *    - argv: An array of command-line argument strings.
  * @return: 0 on success, -1 on error
  */
-int main(int argc, char **argv) {
+// int main(int argc, char **argv) {
+
+//     // Parse command-line arguments
+//     if (argc > 1 && strcmp(argv[1], "-d") == 0) 
+//     {
+//         daemon_mode = 1; // Set daemon_mode to 1 if "-d" option is provided
+//     } 
+
+//     // Initialize syslog
+//     openlog(NULL, 0, LOG_USER); // Open syslog with LOG_USER facility
+
+//     syslog(LOG_INFO, "Socket started!"); // Log that the socket has started
+
+//     // Signal handling
+//     signal(SIGINT, signal_handler); // Register signal_handler for SIGINT
+//     signal(SIGTERM, signal_handler); // Register signal_handler for SIGTERM
+    
+//     // Daemon mode
+//     if (daemon_mode) 
+//     {
+//         syslog(LOG_DEBUG, "Daemon created!"); // Log that a daemon was created
+
+//         daemonize(); // Call the daemonize function to daemonize the process
+//     }
+
+// 	pthread_mutex_init(&mutex_lock, NULL);
+	
+//     SLIST_INIT(&head);
+
+//     // Create socket
+//     server_socket = socket(AF_INET, SOCK_STREAM, 0); // Create a socket
+//     if (server_socket == -1) {
+//         perror("Socket creation failed"); // Print an error message if socket creation fails
+//         syslog(LOG_ERR, "Error creating socket: %m"); // Log socket creation error
+//         return -1; // Return an error status
+//     }
+
+//     if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(option_value)) == -1) 
+//     {
+//         perror("setsockopt"); // Print an error message if setsockopt fails
+//         syslog(LOG_ERR, "Error setting socket options: %m"); // Log setsockopt error
+//         close(server_socket); // Close the server socket
+//         return -1; // Return an error status
+//     }
+
+//     struct sockaddr_in server_addr;
+//     memset(&server_addr, 0, sizeof(server_addr));
+//     server_addr.sin_family = AF_INET;
+//     server_addr.sin_port = htons(PORT);
+//     server_addr.sin_addr.s_addr = INADDR_ANY; 
+
+//     // Bind socket to port 9000
+//     if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
+//         perror("Socket bind failed"); // Print an error message if socket bind fails
+//         syslog(LOG_ERR, "Socket bind failed: %m"); // Log socket bind error
+//         close(server_socket); // Close the server socket
+//         return -1; // Return an error status
+//     }
+
+// 	// Listen for incoming connections
+// 	if (listen(server_socket, 10) == -1) {
+// 		perror("Listen failed"); // Print an error message if listen fails
+// 		syslog(LOG_ERR, "Listen failed: %m"); // Log listen error
+// 		close(server_socket); // Close the server socket
+// 		return -1; // Return an error status
+// 	}
+
+//     while (!sig_handler_hit) 
+//     {
+//         // if (sig_handler_hit) {
+//         //     exit_safely();
+//         // }
+
+// 		// timer thread should run  once in parent!
+//         #ifndef USE_AESD_CHAR_DEVICE
+//         if (!timer_thread_flag) {
+// 			pthread_create(&timer_thread, NULL, timer_handler, NULL);
+// 			timer_thread_flag = true;
+// 		}
+//         #endif
+
+//         struct sockaddr_in client_addr;
+//         socklen_t client_len = sizeof(client_addr);
+        
+//         // Accept incoming connection
+//         client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
+//         if (client_socket == -1) {
+//             perror("Accept failed"); // Print an error message if accept fails
+//             syslog(LOG_ERR, "Accept failed: %m"); // Log accept error
+//         }
+//         else {
+//             char client_ip[INET_ADDRSTRLEN];
+
+//             getpeername(client_socket, (struct sockaddr *)&client_addr, &client_len);
+
+//             inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+
+//             // Log accepted connection
+//             syslog(LOG_INFO, "Accepted connection from %s", client_ip);
+
+// 			/* rest is moved inside the thread handler */ 
+            
+// 			/* NODE CREATION FOR CURRENT CONNECTION */ 
+// 			// Allocating memory for the connection (List's node)
+// 		    datap = (slist_data_t *)malloc(sizeof(slist_data_t));
+
+// 			// Initializing the node with current connection's data
+//             datap->connection_data_node.client_socket = client_socket;
+
+// 			// Initially thread complete flag will be false
+//             datap->connection_data_node.thread_complete = false;
+
+// 			// Insert node in the list
+//             SLIST_INSERT_HEAD(&head, datap, entries);
+
+// 			// Spawning a new thread for current connection
+//             pthread_create(&(datap->connection_data_node.thread_id), // ID returned by pthread_create()
+//                             NULL,
+//                             thread_func,
+//                             &datap->connection_data_node
+// 		    );
+
+// 			// Joining all the completed connection threads 
+//             SLIST_FOREACH(datap, &head, entries) {
+//                 if (datap->connection_data_node.thread_complete) {
+//                     pthread_join(datap->connection_data_node.thread_id, NULL);
+
+// 					syslog(LOG_DEBUG, "Closed connection from %s", client_ip);
+// 		    		printf("Closed connection from %s\n", client_ip);
+
+// 					// removing the node from list and freeing it
+//                     SLIST_REMOVE(&head, datap, slist_data_s, entries);
+//                     free(datap);
+
+//                     break;
+//                 }
+//             }
+
+//             // syslog(LOG_DEBUG, "Closed connection from %s", client_ip);
+// 		    // printf("Closed connection from %s\n", client_ip);
+//         }
+//     }
+
+//     close(server_socket);
+//     if (unlink(file_path) == -1) {
+//         syslog(LOG_ERR, "Error removing data file: %m"); // Log error when removing data file
+//     }
+//     close(client_socket);
+// 	closelog();
+
+// #ifndef USE_AESD_CHAR_DEVICE
+// 	if (timer_thread) {
+// 		pthread_join(timer_thread, NULL);
+// 	}
+// #endif
+
+//     return 0;
+// }
+
+int main(int argc, char *argv[])
+{
+	// // Parse command-line arguments
+    // if (argc > 1 && strcmp(argv[1], "-d") == 0) 
+    // {
+    //     daemon_mode = 1; // Set daemon_mode to 1 if "-d" option is provided
+    // } 
+
+	// // open the log file
+	// openlog("A6P1", LOG_PID, LOG_USER);
+
+	// syslog(LOG_DEBUG, "syslog opened."); // indicating logging
+	// // to associate signal handler with corresponding signals using signal() API
+	// signal(SIGINT, signal_handler);
+	// signal(SIGTERM, signal_handler);
+	// signal(SIGKILL, signal_handler);
+
+	// pthread_mutex_init(&mutex_lock, NULL);
+
+	// // Check the actual value of argv here:
+	// if ((argc > 1) && (!strcmp("-d", (char *)argv[1])))
+	// {
+
+	// 	printf("Running in daemon mode!\n");
+	// 	syslog(LOG_DEBUG, "aesdsocket entering daemon mode");
+
+	// 	deamon_flag = 1;
+	// }
 
     // Parse command-line arguments
     if (argc > 1 && strcmp(argv[1], "-d") == 0) 
@@ -463,7 +649,7 @@ int main(int argc, char **argv) {
     // Signal handling
     signal(SIGINT, signal_handler); // Register signal_handler for SIGINT
     signal(SIGTERM, signal_handler); // Register signal_handler for SIGTERM
-    
+
     // Daemon mode
     if (daemon_mode) 
     {
@@ -473,169 +659,14 @@ int main(int argc, char **argv) {
     }
 
 	pthread_mutex_init(&mutex_lock, NULL);
-	
-    SLIST_INIT(&head);
 
-    // Create socket
-    server_socket = socket(AF_INET, SOCK_STREAM, 0); // Create a socket
-    if (server_socket == -1) {
-        perror("Socket creation failed"); // Print an error message if socket creation fails
-        syslog(LOG_ERR, "Error creating socket: %m"); // Log socket creation error
-        return -1; // Return an error status
-    }
+	socket_connect();
 
-    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(option_value)) == -1) 
-    {
-        perror("setsockopt"); // Print an error message if setsockopt fails
-        syslog(LOG_ERR, "Error setting socket options: %m"); // Log setsockopt error
-        close(server_socket); // Close the server socket
-        return -1; // Return an error status
-    }
-
-    struct sockaddr_in server_addr;
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(PORT);
-    server_addr.sin_addr.s_addr = INADDR_ANY; 
-
-    // Bind socket to port 9000
-    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1) {
-        perror("Socket bind failed"); // Print an error message if socket bind fails
-        syslog(LOG_ERR, "Socket bind failed: %m"); // Log socket bind error
-        close(server_socket); // Close the server socket
-        return -1; // Return an error status
-    }
-
-	// Listen for incoming connections
-	if (listen(server_socket, 10) == -1) {
-		perror("Listen failed"); // Print an error message if listen fails
-		syslog(LOG_ERR, "Listen failed: %m"); // Log listen error
-		close(server_socket); // Close the server socket
-		return -1; // Return an error status
-	}
-
-    while (!sig_handler_hit) 
-    {
-        // if (sig_handler_hit) {
-        //     exit_safely();
-        // }
-
-		// timer thread should run  once in parent!
-        #ifndef USE_AESD_CHAR_DEVICE
-        if (!timer_thread_flag) {
-			pthread_create(&timer_thread, NULL, timer_handler, NULL);
-			timer_thread_flag = true;
-		}
-        #endif
-
-        struct sockaddr_in client_addr;
-        socklen_t client_len = sizeof(client_addr);
-        
-        // Accept incoming connection
-        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
-        if (client_socket == -1) {
-            perror("Accept failed"); // Print an error message if accept fails
-            syslog(LOG_ERR, "Accept failed: %m"); // Log accept error
-        }
-        else {
-            char client_ip[INET_ADDRSTRLEN];
-
-            getpeername(client_socket, (struct sockaddr *)&client_addr, &client_len);
-
-            inet_ntop(AF_INET, &(client_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
-
-            // Log accepted connection
-            syslog(LOG_INFO, "Accepted connection from %s", client_ip);
-
-			/* rest is moved inside the thread handler */ 
-            
-			/* NODE CREATION FOR CURRENT CONNECTION */ 
-			// Allocating memory for the connection (List's node)
-		    datap = (slist_data_t *)malloc(sizeof(slist_data_t));
-
-			// Initializing the node with current connection's data
-            datap->connection_data_node.client_socket = client_socket;
-
-			// Initially thread complete flag will be false
-            datap->connection_data_node.thread_complete = false;
-
-			// Insert node in the list
-            SLIST_INSERT_HEAD(&head, datap, entries);
-
-			// Spawning a new thread for current connection
-            pthread_create(&(datap->connection_data_node.thread_id), // ID returned by pthread_create()
-                            NULL,
-                            thread_func,
-                            &datap->connection_data_node
-		    );
-
-			// Joining all the completed connection threads 
-            SLIST_FOREACH(datap, &head, entries) {
-                if (datap->connection_data_node.thread_complete) {
-                    pthread_join(datap->connection_data_node.thread_id, NULL);
-
-					syslog(LOG_DEBUG, "Closed connection from %s", client_ip);
-		    		printf("Closed connection from %s\n", client_ip);
-
-					// removing the node from list and freeing it
-                    SLIST_REMOVE(&head, datap, slist_data_s, entries);
-                    free(datap);
-
-                    break;
-                }
-            }
-
-            // syslog(LOG_DEBUG, "Closed connection from %s", client_ip);
-		    // printf("Closed connection from %s\n", client_ip);
-        }
-    }
-
-    close(server_socket);
-    if (unlink(file_path) == -1) {
-        syslog(LOG_ERR, "Error removing data file: %m"); // Log error when removing data file
-    }
-    close(client_socket);
+	// closing syslog
 	closelog();
 
-#ifndef USE_AESD_CHAR_DEVICE
-	if (timer_thread) {
-		pthread_join(timer_thread, NULL);
-	}
-#endif
-
-    return 0;
+	return 0;
 }
-
-// int main(int argc, char *argv[])
-// {
-// 	// open the log file
-// 	openlog("A6P1", LOG_PID, LOG_USER);
-
-// 	syslog(LOG_DEBUG, "syslog opened."); // indicating logging
-// 	// to associate signal handler with corresponding signals using signal() API
-// 	signal(SIGINT, signal_handler);
-// 	signal(SIGTERM, signal_handler);
-// 	signal(SIGKILL, signal_handler);
-
-// 	pthread_mutex_init(&mutex_lock, NULL);
-
-// 	// Check the actual value of argv here:
-// 	if ((argc > 1) && (!strcmp("-d", (char *)argv[1])))
-// 	{
-
-// 		printf("Running in daemon mode!\n");
-// 		syslog(LOG_DEBUG, "aesdsocket entering daemon mode");
-
-// 		deamon_flag = 1;
-// 	}
-
-// 	socket_connect();
-
-// 	// closing syslog
-// 	closelog();
-
-// 	return 0;
-// }
 
 /*SOCKET COMMUNICATION FUNCTION*/
 /*
