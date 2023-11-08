@@ -55,8 +55,6 @@ int file_fd = 0;
 // int msg_flag = 0;
 
 char *server_port = "9000"; // given port for communication
-int socket_fd = 0;			// socket file descriptor
-int accept_fd = 0;			// client accept file descriptor
 int data_count = 0;			// for counting the data packet bytes
 // int file_fd = 0;			// file as defined in path to be created
 bool process_flag = false;
@@ -543,7 +541,7 @@ void socket_connection_operations()
     freeaddrinfo(result);
 
     // Daemonize the process if the flag is set
-    if (daemon_flag == 1) {
+    if (deamon_flag == 1) {
         int daemon_ret = daemon(0, 0);
         if (daemon_ret == -1) {
             printf("Error: Unable to enter daemon mode\n");
