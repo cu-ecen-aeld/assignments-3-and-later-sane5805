@@ -60,7 +60,7 @@ int accept_fd = 0;			// client accept file descriptor
 int data_count = 0;			// for counting the data packet bytes
 // int file_fd = 0;			// file as defined in path to be created
 bool process_flag = false;
-// int deamon_flag = 0;
+int deamon_flag = 0;
 
 
 bool sig_handler_hit = false;
@@ -650,13 +650,13 @@ int main(int argc, char *argv[])
     signal(SIGINT, signal_handler); // Register signal_handler for SIGINT
     signal(SIGTERM, signal_handler); // Register signal_handler for SIGTERM
 
-    // Daemon mode
-    if (daemon_mode) 
-    {
-        syslog(LOG_DEBUG, "Daemon created!"); // Log that a daemon was created
+    // // Daemon mode
+    // if (daemon_mode) 
+    // {
+    //     syslog(LOG_DEBUG, "Daemon created!"); // Log that a daemon was created
 
-        daemonize(); // Call the daemonize function to daemonize the process
-    }
+    //     daemonize(); // Call the daemonize function to daemonize the process
+    // }
 
 	pthread_mutex_init(&mutex_lock, NULL);
 
@@ -753,15 +753,15 @@ void socket_connect()
 	// free after use
 	freeaddrinfo(res);
 
-	// if (deamon_flag == 1)
-	// {
-	// 	int temp_daemon = daemon(0, 0);
-	// 	if (temp_daemon == -1)
-	// 	{
-	// 		printf("Couldn't process into deamon mode\n");
-	// 		syslog(LOG_ERR, "failed to enter deamon mode %s", strerror(errno));
-	// 	}
-	// }
+	if (deamon_flag == 1)
+	{
+		int temp_daemon = daemon(0, 0);
+		if (temp_daemon == -1)
+		{
+			printf("Couldn't process into deamon mode\n");
+			syslog(LOG_ERR, "failed to enter deamon mode %s", strerror(errno));
+		}
+	}
 #ifndef USE_AESD_CHAR_DEVICE
 	bool timer_thread_flag = false;
 #endif
